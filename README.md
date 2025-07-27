@@ -1,11 +1,9 @@
 # Vehicle Decoder Application
 
 This repository contains a simple web application that decodes vehicle
-information from a VIN (Vehicle Identification Number) or a licence
-plate.  When a VIN is supplied, the application calls the public
-**NHTSA vPIC API** to return details about the vehicle.  When a plate
-and state/province are supplied, the application can optionally call
-the **CarsXE Plate Decoder API** if you configure an API key.  The
+information from a VIN (Vehicle Identification Number). The
+application calls the public **NHTSA vPIC API** to return details about
+the vehicle. The
 application is containerised with Docker and the Terraform
 configuration in the `terraform` directory can be used to deploy it
 to AWS using Fargate and an Application Load Balancer.
@@ -17,15 +15,9 @@ to AWS using Fargate and an Application Load Balancer.
   vPIC documentation notes that `DecodeVinValues` returns flat key‑value
   pairs in JSON and supports optional `modelyear` query parameters
   【311902232095331†L68-L99】.
-* **Decode licence plates via CarsXE (optional):** If you set
-  `CARSXE_API_KEY` in the environment the app will make an HTTP GET
-  request to `http://api.carsxe.com/platedecoder` with the `plate`,
-  `state`, `format=json` and `key` parameters.  The CarsXE tutorial
-  highlights that these parameters are required to successfully call
-  the endpoint【545417615960480†L75-L86】.
-* **Single‑page form:** A simple HTML form allows the user to enter
-  either a VIN or a licence plate and state/province.  Results are
-  displayed in JSON format.
+* **Single‑page form:** A simple HTML form allows the user to enter a
+  VIN and optionally a model year. Results are displayed in JSON
+  format.
 * **Containerised:** A `Dockerfile` is provided to build a lightweight
   image based on Python 3.10.
 * **Infrastructure as Code:** Terraform scripts create an ECR
@@ -48,8 +40,6 @@ to AWS using Fargate and an Application Load Balancer.
 2. **Run the app locally:**
 
    ```bash
-   # Optionally export an API key for plate decoding
-   export CARSXE_API_KEY=your_carsxe_api_key
    python app.py
    ```
 
@@ -63,7 +53,6 @@ To build the Docker image and run it locally:
 cd vehicle_decoder
 docker build -t vehicle-decoder:latest .
 docker run -p 5000:5000 \
-  -e CARSXE_API_KEY=your_carsxe_api_key \
   vehicle-decoder:latest
 ```
 
@@ -120,7 +109,6 @@ the AWS CLI or environment variables and have [Terraform installed](https://www.
    # terraform.tfvars
    prefix        = "vehicle-decoder"
    image_url     = "ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/vehicle-decoder-repo:v1"
-   carsxe_api_key = "" # optional: set your API key here or leave blank
    desired_count = 2    # adjust as needed
    ```
 
@@ -137,23 +125,14 @@ the AWS CLI or environment variables and have [Terraform installed](https://www.
 4. **Access your application:**
 
    Visit `http://<load_balancer_dns>` in your web browser.  You should
-   see the Vehicle Decoder form and be able to decode VINs (and
-   licence plates if an API key is configured).
+   see the Vehicle Decoder form and be able to decode VINs.
 
 ## Customisation
 
-* **CarsXE API key:** To enable licence plate decoding, sign up for a
-  CarsXE account and obtain an API key.  Pass this key via the
-  `carsxe_api_key` Terraform variable or set the `CARSXE_API_KEY`
-  environment variable when running locally.
 * **Scaling:** Adjust `desired_count`, `ecs_task_cpu`, and
   `ecs_task_memory` in `terraform.tfvars` to scale the service.
 
 ## Caveats
 
-* The CarsXE Plate Decoder API requires an API key and may charge
-  per‑request fees.  The provided code will gracefully handle
-  situations where the key is omitted by returning a user‑friendly
-  error message.
 * The NHTSA vPIC API is public and free to use but is subject to
   rate limits.  Refer to NHTSA documentation for details【311902232095331†L68-L99】.

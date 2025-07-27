@@ -38,9 +38,3 @@ variable "image_url" {
   description = "Full URI of the Docker image to deploy (e.g. account-id.dkr.ecr.us-west-2.amazonaws.com/repo:tag)"
   type        = string
 }
-
-variable "carsxe_api_key" {
-  description = "API key for CarsXE Plate Decoder API. Leave empty to disable plate decoding."
-  type        = string
-  default     = ""
-}

@@ -144,10 +144,6 @@ resource "aws_ecs_task_definition" "app" {
         {
           name  = "PORT"
           value = tostring(var.task_port)
-        },
-        {
-          name  = "CARSXE_API_KEY"
-          value = var.carsxe_api_key
         }
       ]
       logConfiguration = {

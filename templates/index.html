@@ -72,11 +72,6 @@
       <form id="decoderForm">
         <label for="vin">VIN (17 characters)</label>
         <input type="text" id="vin" name="vin" placeholder="Enter VIN, e.g., 1HGCM82633A123456" />
-        <small>– OR –</small>
-        <label for="plate">License Plate</label>
-        <input type="text" id="plate" name="plate" placeholder="e.g., 7ABC123" />
-        <label for="state">State / Province</label>
-        <input type="text" id="state" name="state" placeholder="e.g., CA, TX, ON" />
         <label for="year">Model Year (optional for VIN)</label>
         <input type="text" id="year" name="year" placeholder="e.g., 2020" />
         <button type="submit">Decode</button>
@@ -87,13 +82,9 @@
       document.getElementById('decoderForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const vin = document.getElementById('vin').value.trim();
-        const plate = document.getElementById('plate').value.trim();
-        const state = document.getElementById('state').value.trim();
         const year = document.getElementById('year').value.trim();
         const params = new URLSearchParams();
         if (vin) params.append('vin', vin);
-        if (plate) params.append('plate', plate);
-        if (state) params.append('state', state);
         if (year) params.append('year', year);
         const response = await fetch('/decode', {
           method: 'POST',
