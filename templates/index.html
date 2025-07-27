@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vehicle Decoder</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 40px;
+        margin: 0;
+        background-color: #f7f7f7;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: bold;
+      }
+      input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      small {
+        display: block;
+        text-align: center;
+        margin-top: 12px;
+        margin-bottom: 12px;
+        color: #666;
+      }
+      button {
+        margin-top: 16px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .result {
+        margin-top: 24px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        background-color: #f0f0f0;
+        padding: 12px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Vehicle Decoder</h1>
+      <form id="decoderForm">
+        <label for="vin">VIN (17 characters)</label>
+        <input type="text" id="vin" name="vin" placeholder="Enter VIN, e.g., 1HGCM82633A123456" />
+        <small>– OR –</small>
+        <label for="plate">License Plate</label>
+        <input type="text" id="plate" name="plate" placeholder="e.g., 7ABC123" />
+        <label for="state">State / Province</label>
+        <input type="text" id="state" name="state" placeholder="e.g., CA, TX, ON" />
+        <label for="year">Model Year (optional for VIN)</label>
+        <input type="text" id="year" name="year" placeholder="e.g., 2020" />
+        <button type="submit">Decode</button>
+      </form>
+      <div class="result" id="result"></div>
+    </div>
+    <script>
+      document.getElementById('decoderForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const vin = document.getElementById('vin').value.trim();
+        const plate = document.getElementById('plate').value.trim();
+        const state = document.getElementById('state').value.trim();
+        const year = document.getElementById('year').value.trim();
+        const params = new URLSearchParams();
+        if (vin) params.append('vin', vin);
+        if (plate) params.append('plate', plate);
+        if (state) params.append('state', state);
+        if (year) params.append('year', year);
+        const response = await fetch('/decode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString(),
+        });
+        const data = await response.json();
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>
