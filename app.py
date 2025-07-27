@@ -14,9 +14,7 @@ from flask import Flask, render_template, request, jsonify
 
 from decoder import (
     decode_vin,
-    decode_plate,
     parse_vin_result,
-    parse_plate_result,
     Car,
 )
 
@@ -31,7 +29,7 @@ def index() -> str:
 
 @app.route("/decode", methods=["POST"])
 def decode() -> tuple[str, int] | tuple[dict, int]:
-    """Handle form submissions for VIN or licence plate decoding.
+    """Handle form submissions for VIN decoding.
 
     The endpoint returns a JSON response containing either a `car` key
     when decoding succeeds or an `error` key when input is invalid or
@@ -39,8 +37,6 @@ def decode() -> tuple[str, int] | tuple[dict, int]:
     defined fields (see `Car.to_dict`).
     """
     vin = request.form.get("vin", "").strip().upper()
-    plate = request.form.get("plate", "").strip().upper()
-    state = request.form.get("state", "").strip().upper()
     year = request.form.get("year", "").strip()
     if vin:
         try:
@@ -49,18 +45,8 @@ def decode() -> tuple[str, int] | tuple[dict, int]:
             return jsonify({"car": car.to_dict()}), 200
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
-    elif plate and state:
-        raw = decode_plate(plate, state)
-        # If decode_plate returned an error dict, propagate it
-        if isinstance(raw, dict) and raw.get("error"):
-            return jsonify(raw), 200
-        result = parse_plate_result(raw)
-        if isinstance(result, Car):
-            return jsonify({"car": result.to_dict()}), 200
-        else:
-            return jsonify(result), 200
     else:
-        return jsonify({"error": "Please provide a VIN or a plate and state."}), 400
+        return jsonify({"error": "Please provide a VIN."}), 400
 
 
 if __name__ == "__main__":
